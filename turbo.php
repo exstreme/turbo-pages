@@ -16,6 +16,7 @@ $title = "Удаление вирусов на сайте";
 $description = "Чистка вебсайтов от вирусов на Joomla, Wordpress, Modx, Drupal, Magento, Bitrix и других CMS, установка защиты, устранение уязвимостей, гарантия на работу.";
 $email = "info@protectyoursite.ru";
 $emailfrom = "Защита сайтов от вирусов и уязвимостей";
+$author = "Protect Your Site";
 /* Configuration block end */
 
 define( '_JEXEC', 1 );
@@ -51,12 +52,12 @@ $xml='<?xml version="1.0" encoding="utf-8"?>
     xmlns:turbo="http://turbo.yandex.ru"
     version="2.0">
 	<channel>
-		<title>$title</title>
-		<description><![CDATA[$description]]></description>
+		<title>'.$title.'</title>
+		<description><![CDATA['.$description.']]></description>
 		<link>'.$siteurl.'/</link>
 		<lastBuildDate>'.date(DATE_ATOM).'</lastBuildDate>
 		<language>ru-ru</language>
-		<managingEditor>$email ($emailfrom)</managingEditor>';
+		<managingEditor>'.$email.' ('.$emailfrom.')</managingEditor>';
 foreach($list as $item) {
     $xml.='
 			<item turbo="true">
@@ -66,7 +67,7 @@ foreach($list as $item) {
     $xml.=$item->fulltext ? htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->fulltext)) : '';
     $xml.='<div data-block="share" data-network="vkontakte, twitter, facebook, google, telegram, odnoklassniki"></div>'; // Добавляем кнопки поделиться в соцсети
     $xml.=']]></turbo:content>
-			<author>Protect Your Site</author>
+			<author>'.$author.'</author>
 			<pubDate>'.$item->publish_up.'</pubDate>
 		</item>';
 }
