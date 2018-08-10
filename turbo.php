@@ -64,6 +64,7 @@ foreach($list as $item) {
 			<link>'.$siteurl.\Joomla\CMS\Router\Route::_('index.php?option=com_content&view=article&id='.$item->id.'&catid='.$item->catid).'</link>
 			<turbo:content><![CDATA['.htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->introtext));
     $xml.=$item->fulltext ? htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->fulltext)) : '';
+    $xml.='<div data-block="share" data-network="vkontakte, twitter, facebook, google, telegram, odnoklassniki"></div>'; // Добавляем кнопки поделиться в соцсети
     $xml.=']]></turbo:content>
 			<author>Protect Your Site</author>
 			<pubDate>'.$item->publish_up.'</pubDate>
