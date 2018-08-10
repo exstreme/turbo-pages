@@ -60,7 +60,7 @@ $xml='<?xml version="1.0" encoding="utf-8"?>
 foreach($list as $item) {
     $xml.='
 			<item turbo="true">
-			<title>'.$item->title.'</title>
+			<title>'.htmlspecialchars($item->title).'</title>
 			<link>'.$siteurl.\Joomla\CMS\Router\Route::_('index.php?option=com_content&view=article&id='.$item->id.'&catid='.$item->catid).'</link>
 			<turbo:content><![CDATA['.htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->introtext));
     $xml.=$item->fulltext ? htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->fulltext)) : '';
