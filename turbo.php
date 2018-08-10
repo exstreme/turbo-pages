@@ -7,6 +7,17 @@
  * Link: https://protectyoursite.ru
  * Version: 1.0.0
  */
+
+/* Configuration block
+Здесь задаются переменные, которые будут использоваться, необходимо заменить на свои значения!
+*/
+$siteurl="https://protectyoursite.ru"; // Задаём адрес сайта
+$title = "Удаление вирусов на сайте";
+$description = "Чистка вебсайтов от вирусов на Joomla, Wordpress, Modx, Drupal, Magento, Bitrix и других CMS, установка защиты, устранение уязвимостей, гарантия на работу.";
+$email = "info@protectyoursite.ru";
+$emailfrom = "Защита сайтов от вирусов и уязвимостей";
+/* Configuration block end */
+
 define( '_JEXEC', 1 );
 if ( file_exists( __DIR__ . '/defines.php' ) ) {
     include_once __DIR__ . '/defines.php';
@@ -18,7 +29,6 @@ if ( !defined( '_JDEFINES' ) ) {
 require_once JPATH_BASE . '/includes/framework.php';
 $app = JFactory::getApplication('site');
 
-$siteurl="https://protectyoursite.ru"; // Задаём адрес сайта
 /* Выборка с базы данных, добавить необходимые параметры или закомментировать лишние */
 $db = JFactory::getDbo();
 $query = $db->getQuery( true )
@@ -41,12 +51,12 @@ $xml='<?xml version="1.0" encoding="utf-8"?>
     xmlns:turbo="http://turbo.yandex.ru"
     version="2.0">
 	<channel>
-		<title>Удаление вирусов на сайте</title>
-		<description><![CDATA[Чистка вебсайтов от вирусов на Joomla, Wordpress, Modx, Drupal, Magento, Bitrix и других CMS, установка защиты, устранение уязвимостей, гарантия на работу.]]></description>
+		<title>$title</title>
+		<description><![CDATA[$description]]></description>
 		<link>'.$siteurl.'/</link>
 		<lastBuildDate>'.date(DATE_ATOM).'</lastBuildDate>
 		<language>ru-ru</language>
-		<managingEditor>info@protectyoursite.ru (Защита сайтов от вирусов и уязвимостей)</managingEditor>';
+		<managingEditor>$email ($emailfrom)</managingEditor>';
 foreach($list as $item) {
     $xml.='
 			<item turbo="true">
