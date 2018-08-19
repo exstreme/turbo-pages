@@ -1,11 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: exstreme
- * Date: 07.12.2017
- * Time: 20:06
- * Link: https://protectyoursite.ru
- * Version: 1.0.0
+ *  * Created by PhpStorm.
+ *  * User: exstreme
+ *  * Date:19.08.18 13:43
+ *  * Link: https://protectyoursite.ru
+ *  * Version: 1.1.0
  */
 
 /* Configuration block
@@ -57,7 +56,7 @@ if ( defined( 'TURBO_HEADER' ) ) {
         ->where('published=1') // Только опубликованные
         ->where('access=1') // Доступные для всех
         ->where("menutype='$menutype'"); // Задаём тип меню
-    $menu = $db->setQuery( $query )->loadObjectList();
+    $menu = $db->setQuery( $query,0,9 )->loadObjectList();
 }
 
 $xml='<?xml version="1.0" encoding="utf-8"?>
