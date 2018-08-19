@@ -11,12 +11,16 @@
 /* Configuration block
 Здесь задаются переменные, которые будут использоваться, необходимо заменить на свои значения!
 */
-$siteurl="https://protectyoursite.ru"; // Задаём адрес сайта
+$siteurl="https://protectyoursite.ru"; // Задаём адрес сайта без слеша на конце
 $title = "Удаление вирусов на сайте";
 $description = "Чистка вебсайтов от вирусов на Joomla, Wordpress, Modx, Drupal, Magento, Bitrix и других CMS, установка защиты, устранение уязвимостей, гарантия на работу.";
-$email = "info@protectyoursite.ru";
-$emailfrom = "Защита сайтов от вирусов и уязвимостей";
 $author = "Protect Your Site";
+/* Добавляем данные для шапки
+Удалить данную строку, если шапка не нужна */
+$logo = "/images/audit-bezopasnosti.jpg"; // Указываем логотип со слешем в начале
+$menutype = "mainmenu"; //Тип меню
+define( 'TURBO_HEADER', true );
+/* Конец настроек шапки */
 /* Configuration block end */
 
 define( '_JEXEC', 1 );
@@ -44,6 +48,17 @@ $query = $db->getQuery( true )
     ->where('access=1') // Доступные для всех
     ->where("catid IN ('2','9')"); // Задаём отдельные категории
 $list = $db->setQuery( $query )->loadObjectList();
+if ( defined( 'TURBO_HEADER' ) ) {
+    $query = $db->getQuery( true )
+        ->select($db->quoteName('id'))
+        ->select($db->quoteName('title'))
+        ->select($db->quoteName('link'))
+        ->from( '#__menu' )
+        ->where('published=1') // Только опубликованные
+        ->where('access=1') // Доступные для всех
+        ->where("menutype='$menutype'"); // Задаём тип меню
+    $menu = $db->setQuery( $query )->loadObjectList();
+}
 
 $xml='<?xml version="1.0" encoding="utf-8"?>
 <rss
@@ -56,14 +71,31 @@ $xml='<?xml version="1.0" encoding="utf-8"?>
 		<description><![CDATA['.$description.']]></description>
 		<link>'.$siteurl.'/</link>
 		<lastBuildDate>'.date(DATE_ATOM).'</lastBuildDate>
-		<language>ru-ru</language>
-		<managingEditor>'.$email.' ('.$emailfrom.')</managingEditor>';
+		<language>ru-ru</language>';
 foreach($list as $item) {
     $xml.='
 			<item turbo="true">
 			<title>'.htmlspecialchars($item->title).'</title>
-			<link>'.$siteurl.\Joomla\CMS\Router\Route::_('index.php?option=com_content&view=article&id='.$item->id.'&catid='.$item->catid).'</link>
-			<turbo:content><![CDATA['.htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->introtext));
+			<link>'.$siteurl.\Joomla\CMS\Router\Route::_('index.php?option=com_content&view=article&id='.$item->id.'&catid='.$item->catid).'</link>';
+    $xml.='<turbo:content><![CDATA[';
+    if ( defined( 'TURBO_HEADER' ) ) {
+        $xml.='<header>
+                       <figure>
+                           <img
+                            src="'.$siteurl.$logo.'" />
+                       </figure>
+                       <h1>'.$title.'</h1>
+                       <h2>'.$description.'</h2>
+                       <menu>';
+        foreach($menu as $menuitem){
+            $xml.='<a href="'.$siteurl.\Joomla\CMS\Router\Route::_($menuitem->link).'">
+								'.htmlspecialchars($menuitem->title).'
+						   </a>';
+        }
+        $xml.='</menu>
+                </header>';
+    }
+        $xml.=htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->introtext));
     $xml.=$item->fulltext ? htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->fulltext)) : '';
     $xml.='<div data-block="share" data-network="vkontakte, twitter, facebook, google, telegram, odnoklassniki"></div>'; // Добавляем кнопки поделиться в соцсети
     $xml.=']]></turbo:content>
