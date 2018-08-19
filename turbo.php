@@ -2,9 +2,9 @@
 /**
  *  * Created by PhpStorm.
  *  * User: exstreme
- *  * Date:19.08.18 13:43
+ *  * Date:19.08.18 20:51
  *  * Link: https://protectyoursite.ru
- *  * Version: 1.1.0
+ *  * Version: 1.2.0
  */
 
 /* Configuration block
@@ -20,6 +20,8 @@ $logo = "/images/audit-bezopasnosti.jpg"; // Указываем логотип �
 $menutype = "mainmenu"; //Тип меню
 define( 'TURBO_HEADER', true );
 /* Конец настроек шапки */
+/* Расскоментируйте, если хотите подгружать комментарии */
+define( 'TURBO_COMMENTS', true );
 /* Configuration block end */
 
 define( '_JEXEC', 1 );
@@ -33,6 +35,23 @@ if ( !defined( '_JDEFINES' ) ) {
 require_once JPATH_BASE . '/includes/framework.php';
 $app = JFactory::getApplication('site');
 
+/**
+ * Получаем комментарии для каждого материала, но не больше 40
+ * @param $id
+ */
+function get_comments($id){
+    $db = JFactory::getDbo();
+    $query = $db->getQuery( true )
+        ->select($db->quoteName('id'))
+        ->select($db->quoteName('name'))
+        ->select($db->quoteName('comment'))
+        ->select($db->quoteName('date'))
+        ->from( '#__jcomments' )
+        ->where('published=1') // Только опубликованные
+        ->where("object_id=$id"); // Задаём материал
+    $list = $db->setQuery( $query,0,39 )->loadObjectList();
+    return $list;
+}
 /* Выборка с базы данных, добавить необходимые параметры или закомментировать лишние */
 $db = JFactory::getDbo();
 $query = $db->getQuery( true )
@@ -72,10 +91,14 @@ $xml='<?xml version="1.0" encoding="utf-8"?>
 		<lastBuildDate>'.date(DATE_ATOM).'</lastBuildDate>
 		<language>ru-ru</language>';
 foreach($list as $item) {
+    if ( defined( 'TURBO_COMMENTS' ) ) {
+        $comments = get_comments($item->id);
+    }
+    $link = $siteurl.\Joomla\CMS\Router\Route::_('index.php?option=com_content&view=article&id='.$item->id.'&catid='.$item->catid);
     $xml.='
 			<item turbo="true">
 			<title>'.htmlspecialchars($item->title).'</title>
-			<link>'.$siteurl.\Joomla\CMS\Router\Route::_('index.php?option=com_content&view=article&id='.$item->id.'&catid='.$item->catid).'</link>';
+			<link>'.$link.'</link>';
     $xml.='<turbo:content><![CDATA[';
     if ( defined( 'TURBO_HEADER' ) ) {
         $xml.='<header>
@@ -97,6 +120,23 @@ foreach($list as $item) {
         $xml.=htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->introtext));
     $xml.=$item->fulltext ? htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->fulltext)) : '';
     $xml.='<div data-block="share" data-network="vkontakte, twitter, facebook, google, telegram, odnoklassniki"></div>'; // Добавляем кнопки поделиться в соцсети
+    if(!empty($comments)) {
+        $xml.='<div data-block="comments" data-url="'.$link.'#addcomments">';
+        foreach ($comments as $comment) {
+            $xml .= '<div
+                data-block="comment"
+                data-author="' . $comment->name . '" 
+                data-subtitle="' . $comment->date . '"
+               >
+                   <div data-block="content">
+                       <p>
+                            ' . $comment->comment . '
+                       </p>
+                   </div> 
+               </div>';
+        }
+        $xml.='</div>';
+    }
     $xml.=']]></turbo:content>
 			<author>'.$author.'</author>
 			<pubDate>'.$item->publish_up.'</pubDate>
