@@ -2,10 +2,11 @@
 /**
  *  * Created by PhpStorm.
  *  * User: exstreme
- *  * Date:19.08.18 20:51
+ *  * Date: 22.10.18 13:27
  *  * Link: https://protectyoursite.ru
- *  * Version: 1.2.0
+ *  * Version: 1.2.1
  */
+header('Content-Type: text/html; charset=utf-8');
 
 /* Configuration block
 Здесь задаются переменные, которые будут использоваться, необходимо заменить на свои значения!
@@ -95,6 +96,16 @@ foreach($list as $item) {
         $comments = get_comments($item->id);
     }
     $link = $siteurl.\Joomla\CMS\Router\Route::_('index.php?option=com_content&view=article&id='.$item->id.'&catid='.$item->catid);
+    $introtext = htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->introtext));
+    $introtext = str_ireplace('href="#','href="'.$link.'/#',$introtext);
+    $introtext = str_ireplace('src="/','src="'.$link.'/',$introtext);
+    $content = $introtext;
+    if(!empty($item->fulltext)){
+        $fulltext = htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->fulltext));
+        $fulltext = str_ireplace('href="#','href="'.$link.'/#',$fulltext);
+        $fulltext = str_ireplace('src="/','src="'.$link.'/',$fulltext);
+        $content .= $fulltext;
+    }
     $xml.='
 			<item turbo="true">
 			<title>'.htmlspecialchars($item->title).'</title>
@@ -117,8 +128,7 @@ foreach($list as $item) {
         $xml.='</menu>
                 </header>';
     }
-        $xml.=htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->introtext));
-    $xml.=$item->fulltext ? htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->fulltext)) : '';
+    $xml.=$content;
     $xml.='<div data-block="share" data-network="vkontakte, twitter, facebook, google, telegram, odnoklassniki"></div>'; // Добавляем кнопки поделиться в соцсети
     if(!empty($comments)) {
         $xml.='<div data-block="comments" data-url="'.$link.'#addcomments">';
