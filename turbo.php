@@ -98,12 +98,12 @@ foreach($list as $item) {
     $link = $siteurl.\Joomla\CMS\Router\Route::_('index.php?option=com_content&view=article&id='.$item->id.'&catid='.$item->catid);
     $introtext = htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->introtext));
     $introtext = str_ireplace('href="#','href="'.$link.'/#',$introtext);
-    $introtext = str_ireplace('src="/','src="'.$link.'/',$introtext);
+    $introtext = str_ireplace('src="/','src="'.$siteurl.'/',$introtext);
     $content = $introtext;
     if(!empty($item->fulltext)){
         $fulltext = htmlspecialchars_decode(str_ireplace('src="images','src="'.$siteurl.'/images',$item->fulltext));
         $fulltext = str_ireplace('href="#','href="'.$link.'/#',$fulltext);
-        $fulltext = str_ireplace('src="/','src="'.$link.'/',$fulltext);
+        $fulltext = str_ireplace('src="/','src="'.$siteurl.'/',$fulltext);
         $content .= $fulltext;
     }
     $xml.='
